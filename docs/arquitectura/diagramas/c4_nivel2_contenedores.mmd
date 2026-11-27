@@ -1,0 +1,37 @@
+flowchart TB
+  EQ["Equipo participante"]
+  subgraph GITHUB["GitHub"]
+    REPO["Repositorio del hub<br/>model-output/, model-metadata/"]
+    GHA["GitHub Actions<br/>validación hubverse"]
+  end
+  subgraph AZ["Azure — rg-epimodeling-plataforma"]
+    PORTAL["Portal de participantes<br/>App Service (Streamlit)"]
+    ENTRA["Entra External ID"]
+    FUNC["Orquestador<br/>Azure Functions"]
+    COLA["Storage Queue<br/>cola de envíos"]
+    BLOB["Blob Storage<br/>copias inmutables"]
+    JOBS["Container Apps Jobs<br/>Recolector · Validador · Puntaje"]
+    SES["Container Apps<br/>sesiones dinámicas (sandbox)"]
+    PG["PostgreSQL Flexible<br/>envíos y eventos"]
+    KV["Key Vault"]
+    AI["Azure AI Foundry<br/>Claude"]
+    MON["Application Insights<br/>Azure Monitor"]
+  end
+  EQ --> PORTAL
+  PORTAL --> ENTRA
+  EQ -->|"pull request"| REPO
+  REPO --> GHA
+  GHA -->|"webhook"| FUNC
+  FUNC --> COLA
+  COLA --> JOBS
+  JOBS --> BLOB
+  JOBS --> AI
+  JOBS --> SES
+  JOBS --> PG
+  FUNC --> PG
+  FUNC -->|"check runs"| REPO
+  PORTAL --> PG
+  FUNC --> KV
+  JOBS --> KV
+  JOBS --> MON
+  FUNC --> MON

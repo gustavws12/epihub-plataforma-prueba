@@ -1,0 +1,8 @@
+team_abbr: epihub
+model_abbr: ingenuo
+model_name: Modelo ingenuo de prueba
+designated_model: false
+methods: >-
+  Archivo de ejemplo con valores sintéticos para probar el flujo de pull request
+  y la validación automática. No usa datos del SIVIGILA.
+license: CC-BY-4.0

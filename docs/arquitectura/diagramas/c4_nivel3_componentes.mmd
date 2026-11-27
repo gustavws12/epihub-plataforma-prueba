@@ -1,0 +1,42 @@
+flowchart TB
+  GH["GitHub<br/>pull request"]
+  subgraph PIPE["Pipeline de Evaluación"]
+    ORQ["Orquestador<br/>Functions + cola"]
+    REC["Recolector<br/>SHA-256, copia inmutable"]
+    VAL["Validador oficial<br/>R hubValidations + chequeos Anexo A"]
+    subgraph AGT["Agente revisor IA"]
+      INV["Inventario de archivos"]
+      SEG["Filtro de seguridad<br/>semgrep"]
+      PRM["Gestor de prompts"]
+      CLI["Cliente Foundry<br/>Claude"]
+    end
+    VPL["ValidadorPlan<br/>lista de permitidos"]
+    CTL["Controlador de sandbox"]
+    SBX["Sandbox<br/>sesión dinámica R + Python<br/>sin internet"]
+    REP["Verificador de reproducibilidad<br/>tolerancia 1 %"]
+    MOT["Motor de puntaje<br/>R hubEvals: WIS, cobertura, WIS relativo"]
+    NOT["Notificador"]
+  end
+  BLOB["Blob inmutable"]
+  PG["PostgreSQL<br/>ejecucion_eventos"]
+  OBS["Serie observada SIVIGILA"]
+  AI["Azure AI Foundry"]
+  GH -->|"webhook"| ORQ
+  ORQ --> REC
+  REC --> BLOB
+  REC --> VAL
+  VAL -->|"válido"| INV
+  INV --> SEG --> PRM --> CLI
+  CLI <-->|"lee código, propone plan"| AI
+  CLI --> VPL
+  VPL -->|"plan aprobado"| CTL
+  CTL --> SBX
+  SBX --> REP
+  REP -->|"reproducible"| MOT
+  OBS -->|"carga datos observados"| MOT
+  MOT --> NOT
+  VAL -->|"inválido"| NOT
+  VPL -->|"rechazado"| NOT
+  REP -->|"no reproducible"| NOT
+  NOT -->|"check run y comentario"| GH
+  NOT --> PG

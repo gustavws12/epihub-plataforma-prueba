@@ -1,0 +1,10 @@
+# Nunca subir datos del SIVIGILA ni archivos confidenciales
+datos/
+*.xlsx
+*CONFIDENCIAL*
+*.rds
+*.parquet
+.Rhistory
+.RData
+__pycache__/
+.venv/

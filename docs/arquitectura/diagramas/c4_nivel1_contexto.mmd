@@ -1,0 +1,19 @@
+flowchart LR
+  EQ["👥 Equipo participante<br/>(investigadores)"]
+  INS["🏛️ Equipo INS<br/>(coordinación del Hub)"]
+  subgraph PLAT["Plataforma de participantes EpiModelling Hub"]
+    P["Recibe, valida, revisa con IA,<br/>ejecuta y califica los envíos"]
+  end
+  GH["GitHub<br/>(repositorio del hub, PR, Actions)"]
+  ENTRA["Microsoft Entra External ID<br/>(registro e inicio de sesión)"]
+  SIV["SIVIGILA<br/>(casos observados)"]
+  FOUNDRY["Azure AI Foundry<br/>(Claude)"]
+  EQ -->|"se registra"| ENTRA
+  EQ -->|"envía pull request con<br/>pronósticos, covariables y scripts"| GH
+  GH -->|"webhook del PR"| P
+  P -->|"check runs y comentarios"| GH
+  P -->|"lee y propone plan"| FOUNDRY
+  SIV -->|"serie observada semanal"| P
+  INS -->|"publica rondas y revisa tableros"| P
+  P -->|"tablero de puntajes"| INS
+  P -->|"resultado y retroalimentación"| EQ

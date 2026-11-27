@@ -1,0 +1,57 @@
+name: Prueba de conexión
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  conexion:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Datos del repositorio
+        run: |
+          echo "Repositorio: ${{ github.repository }}"
+          echo "Rama:        ${{ github.ref_name }}"
+          echo "Usuario:     ${{ github.actor }}"
+          echo "Commit:      ${{ github.sha }}"
+          {
+            echo "## Prueba de conexión"
+            echo "| Dato | Valor |"; echo "| --- | --- |"
+            echo "| Repositorio | ${{ github.repository }} |"
+            echo "| Usuario | ${{ github.actor }} |"
+            echo "| Commit | \`${{ github.sha }}\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validar el ejemplo incluido
+        run: python scripts/validar_envio.py --todos
+
+      - name: Comprobar que el validador detecta errores
+        run: |
+          if python scripts/validar_envio.py pruebas/epihub-conerrores/*.csv; then
+            echo "::error::El validador no detectó los errores del archivo de prueba"; exit 1
+          else
+            echo "El validador detectó los errores, como se esperaba."
+          fi
+
+      - name: Revisión de seguridad de codigo/
+        run: python scripts/revisar_codigo.py
+
+      - name: Probar el webhook del orquestador (opcional)
+        env:
+          ORQUESTADOR_URL: ${{ secrets.ORQUESTADOR_URL }}
+        run: |
+          if [ -z "$ORQUESTADOR_URL" ]; then echo "Sin ORQUESTADOR_URL: se omite."; exit 0; fi
+          curl -sS -f -X POST "$ORQUESTADOR_URL" -H "Content-Type: application/json" -d '{"prueba":true}'

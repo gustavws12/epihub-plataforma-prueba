@@ -1,0 +1,72 @@
+classDiagram
+  class Envio {
+    +str id_envio
+    +str equipo
+    +str modelo
+    +date reference_date
+    +str sha256
+    +EstadoEnvio estado
+    +avanzar(nuevo: EstadoEnvio)
+  }
+  class EstadoEnvio {
+    <<enumeration>>
+    RECIBIDO
+    VALIDADO
+    REVISADO
+    EJECUTADO
+    REPRODUCIBLE
+    NO_REPRODUCIBLE
+    PUNTUADO
+    FALLIDO
+  }
+  class Inventario {
+    +listar(ruta) List~Archivo~
+    +clasificar(archivo) TipoArchivo
+  }
+  class FiltroSeguridad {
+    +reglas: List~str~
+    +revisar(archivos) List~Hallazgo~
+    +bloquea(hallazgos) bool
+  }
+  class GestorPrompts {
+    +plantilla: str
+    +armar(inventario, hallazgos, anexoA) str
+  }
+  class ClienteFoundry {
+    +despliegue: str
+    +max_tokens: int
+    +proponer_plan(prompt) PlanEjecucion
+  }
+  class PlanEjecucion {
+    +lenguaje: str
+    +paquetes: List~str~
+    +comandos: List~str~
+    +salidas_esperadas: List~str~
+    +justificacion: str
+  }
+  class ValidadorPlan {
+    +paquetes_permitidos: Set~str~
+    +comandos_permitidos: Set~str~
+    +validar(plan) Resultado
+  }
+  class AgenteRevisor {
+    +revisar(envio) PlanEjecucion
+  }
+  class ControladorSandbox {
+    +crear_sesion(imagen) Sesion
+    +ejecutar(plan, sesion) SalidaEjecucion
+    +cerrar(sesion)
+  }
+  class VerificadorReproducibilidad {
+    +tolerancia: float = 0.01
+    +comparar(entregado, regenerado) bool
+  }
+  AgenteRevisor --> Inventario
+  AgenteRevisor --> FiltroSeguridad
+  AgenteRevisor --> GestorPrompts
+  AgenteRevisor --> ClienteFoundry
+  ClienteFoundry --> PlanEjecucion
+  ValidadorPlan --> PlanEjecucion
+  ControladorSandbox --> PlanEjecucion
+  Envio --> EstadoEnvio
+  VerificadorReproducibilidad --> Envio

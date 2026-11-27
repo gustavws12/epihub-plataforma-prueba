@@ -1,0 +1,84 @@
+name: Validar envío
+
+on:
+  pull_request:
+    paths:
+      - "model-output/**"
+      - "model-metadata/**"
+      - "codigo/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Archivos cambiados en el PR
+        id: cambios
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git diff --name-only --diff-filter=AM origin/${{ github.base_ref }}...HEAD -- 'model-output/*.csv' > cambios.txt
+          else
+            ls model-output/*/*.csv > cambios.txt
+          fi
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git diff --name-only --diff-filter=AM origin/${{ github.base_ref }}...HEAD -- 'codigo/' > codigo.txt
+          else
+            find codigo -type f > codigo.txt
+          fi
+          echo "Archivos a validar:"; cat cambios.txt
+          echo "Código a revisar:"; cat codigo.txt
+          echo "n=$(wc -l < cambios.txt)" >> "$GITHUB_OUTPUT"
+
+      - name: Validar formato hubverse (Anexo A)
+        id: validar
+        if: steps.cambios.outputs.n != '0'
+        run: python scripts/validar_envio.py $(cat cambios.txt) | tee resultado.txt
+
+      - name: Revisión de seguridad del código
+        id: seguridad
+        if: always()
+        run: |
+          if [ -s codigo.txt ]; then python scripts/revisar_codigo.py $(cat codigo.txt) | tee seguridad.txt
+          else echo "Sin código nuevo en codigo/" | tee seguridad.txt; fi
+
+      - name: Comentar el resultado en el PR
+        if: always() && github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          {
+            if [ "${{ steps.validar.outcome }}" != "failure" ] && [ "${{ steps.seguridad.outcome }}" != "failure" ]; then
+              echo "✅ **Envío válido.**"
+            else
+              echo "❌ **El envío tiene errores.** Corríjalos y haga un nuevo commit en esta rama."
+            fi
+            echo; echo "**Formato (Anexo A)**"; echo '```'; head -n 40 resultado.txt 2>/dev/null || echo "Sin pronósticos en este PR"; echo '```'
+            echo; echo "**Seguridad del código**"; echo '```'; head -n 20 seguridad.txt; echo '```'
+          } > comentario.md
+          gh pr comment ${{ github.event.pull_request.number }} --body-file comentario.md
+
+      - name: Avisar al orquestador (opcional)
+        if: success() && github.event_name == 'pull_request'
+        env:
+          ORQUESTADOR_URL: ${{ secrets.ORQUESTADOR_URL }}
+        run: |
+          if [ -z "$ORQUESTADOR_URL" ]; then
+            echo "Sin ORQUESTADOR_URL: se omite el aviso (normal en la prueba con GitHub personal)."; exit 0
+          fi
+          curl -sS -f -X POST "$ORQUESTADOR_URL" -H "Content-Type: application/json" \
+            -d "{\"repo\":\"${{ github.repository }}\",\"pr\":${{ github.event.pull_request.number }},\"sha\":\"${{ github.event.pull_request.head.sha }}\"}"

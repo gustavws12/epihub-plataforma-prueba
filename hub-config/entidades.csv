@@ -1,0 +1,39 @@
+location,nombre,tipo
+05,Antioquia,departamento
+08,Atlántico (sin Barranquilla),departamento
+11,Bogotá D. C.,distrito capital
+13,Bolívar (sin Cartagena),departamento
+15,Boyacá,departamento
+17,Caldas,departamento
+18,Caquetá,departamento
+19,Cauca,departamento
+20,Cesar,departamento
+23,Córdoba,departamento
+25,Cundinamarca,departamento
+27,Chocó,departamento
+41,Huila,departamento
+44,La Guajira,departamento
+47,Magdalena (sin Santa Marta),departamento
+50,Meta,departamento
+52,Nariño,departamento
+54,Norte de Santander,departamento
+63,Quindío,departamento
+66,Risaralda,departamento
+68,Santander,departamento
+70,Sucre,departamento
+73,Tolima,departamento
+76,Valle del Cauca (sin Cali ni Buenaventura),departamento
+81,Arauca,departamento
+85,Casanare,departamento
+86,Putumayo,departamento
+88,San Andrés y Providencia,departamento
+91,Amazonas,departamento
+94,Guainía,departamento
+95,Guaviare,departamento
+97,Vaupés,departamento
+99,Vichada,departamento
+08001,Barranquilla,distrito
+13001,Cartagena,distrito
+47001,Santa Marta,distrito
+76001,Santiago de Cali,distrito
+76109,Buenaventura,distrito
