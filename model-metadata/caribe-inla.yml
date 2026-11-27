@@ -1,0 +1,10 @@
+team_abbr: caribe
+model_abbr: inla
+model_name: Equipo Caribe - inla (simulación)
+team_name: Equipo de prueba Caribe
+designated_model: true
+methods: >-
+  Equipo ficticio para probar la conexión y el flujo de pull request.
+  Pronóstico sintético; no usa datos del SIVIGILA.
+language: R
+license: CC-BY-4.0
