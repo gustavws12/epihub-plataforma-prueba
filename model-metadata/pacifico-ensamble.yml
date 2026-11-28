@@ -1,0 +1,10 @@
+team_abbr: pacifico
+model_abbr: ensamble
+model_name: Equipo Pacifico - ensamble (simulación)
+team_name: Equipo de prueba Pacifico
+designated_model: true
+methods: >-
+  Equipo ficticio para probar la conexión y el flujo de pull request.
+  Pronóstico sintético; no usa datos del SIVIGILA.
+language: Python
+license: CC-BY-4.0
