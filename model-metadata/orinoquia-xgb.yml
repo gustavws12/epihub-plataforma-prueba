@@ -1,0 +1,10 @@
+team_abbr: orinoquia
+model_abbr: xgb
+model_name: Equipo Orinoquia - xgb (simulación)
+team_name: Equipo de prueba Orinoquia
+designated_model: true
+methods: >-
+  Equipo ficticio para probar la conexión y el flujo de pull request.
+  Pronóstico sintético; no usa datos del SIVIGILA.
+language: R
+license: CC-BY-4.0
