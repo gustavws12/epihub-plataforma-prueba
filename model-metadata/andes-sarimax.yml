@@ -1,0 +1,10 @@
+team_abbr: andes
+model_abbr: sarimax
+model_name: Equipo Andes - sarimax (simulación)
+team_name: Equipo de prueba Andes
+designated_model: true
+methods: >-
+  Equipo ficticio para probar la conexión y el flujo de pull request.
+  Pronóstico sintético; no usa datos del SIVIGILA.
+language: Python
+license: CC-BY-4.0
